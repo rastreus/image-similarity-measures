@@ -1,0 +1,22 @@
+[tool.poetry]
+name = "image-similarity-measures"
+version = "0.3.6"
+description = "Implementation of eight evaluation metrics to access the similarity between two images. The eight metrics are as follows: RMSE, PSNR, SSIM, ISSM, FSIM, SRE, SAM, and UIQ."
+authors = ["UP42"]
+license = "MIT"
+readme = "README.md"
+packages = [{include = "image_similarity_measures"}]
+
+[tool.poetry.dependencies]
+python = "^3.11"
+numpy = "^1.24.2"
+scikit-image = "^0.20.0"
+opencv-python = "^4.7.0.72"
+phasepack = "^1.5"
+rasterio = "^1.3.6"
+pyFFTW = "^0.13.1"
+
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
