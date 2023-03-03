@@ -32,6 +32,12 @@ def rmse(org_img: np.ndarray, pred_img: np.ndarray, max_p: int = 4095) -> float:
     """
     _assert_image_shapes_equal(org_img, pred_img, "RMSE")
 
+    org_img = org_img.astype(np.float32)
+    
+    # if image is a gray image - add empty 3rd dimension for the .shape[2] to exist
+    if org_img.ndim == 2:
+        org_img = np.expand_dims(org_img, axis=-1)
+    
     rmse_bands = []
     for i in range(org_img.shape[2]):
         dif = np.subtract(org_img[:, :, i], pred_img[:, :, i])
@@ -54,6 +60,12 @@ def psnr(org_img: np.ndarray, pred_img: np.ndarray, max_p: int = 4095) -> float:
     """
     _assert_image_shapes_equal(org_img, pred_img, "PSNR")
 
+    org_img = org_img.astype(np.float32)
+    
+    # if image is a gray image - add empty 3rd dimension for the .shape[2] to exist
+    if org_img.ndim == 2:
+        org_img = np.expand_dims(org_img, axis=-1)
+        
     mse_bands = []
     for i in range(org_img.shape[2]):
         mse_bands.append(np.mean(np.square(org_img[:, :, i] - pred_img[:, :, i])))
@@ -66,7 +78,7 @@ def _similarity_measure(x: np.array, y: np.array, constant: float):
     Calculate feature similarity measurement between two images
     """
     numerator = 2 * x * y + constant
-    denominator = x**2 + y**2 + constant
+    denominator = x ** 2 + y ** 2 + constant
 
     return numerator / denominator
 
@@ -78,7 +90,7 @@ def _gradient_magnitude(img: np.ndarray, img_depth: int):
     scharrx = cv2.Scharr(img, img_depth, 1, 0)
     scharry = cv2.Scharr(img, img_depth, 0, 1)
 
-    return np.sqrt(scharrx**2 + scharry**2)
+    return np.sqrt(scharrx ** 2 + scharry ** 2)
 
 
 def fsim(
@@ -108,6 +120,10 @@ def fsim(
         T2 -- constant based on the dynamic range of GM values
     """
     _assert_image_shapes_equal(org_img, pred_img, "FSIM")
+    
+    # if image is a gray image - add empty 3rd dimension for the .shape[2] to exist
+    if org_img.ndim == 2:
+        org_img = np.expand_dims(org_img, axis=-1)
 
     alpha = (
         beta
@@ -142,7 +158,7 @@ def fsim(
         # Calculate similarity measure for GM1 and GM2
         S_g = _similarity_measure(gm1, gm2, T2)
 
-        S_l = (S_pc**alpha) * (S_g**beta)
+        S_l = (S_pc ** alpha) * (S_g ** beta)
 
         numerator = np.sum(S_l * np.maximum(pc1_2dim_sum, pc2_2dim_sum))
         denominator = np.sum(np.maximum(pc1_2dim_sum, pc2_2dim_sum))
@@ -208,7 +224,7 @@ def ssim(org_img: np.ndarray, pred_img: np.ndarray, max_p: int = 4095) -> float:
     """
     _assert_image_shapes_equal(org_img, pred_img, "SSIM")
 
-    return structural_similarity(org_img, pred_img, data_range=max_p, multichannel=True)
+    return structural_similarity(org_img, pred_img, data_range=max_p, channel_axis=2)
 
 
 def sliding_window(image: np.ndarray, stepSize: int, windowSize: int):
@@ -243,6 +259,10 @@ def uiq(
         # if the window does not meet our desired window size, ignore it
         if window_org.shape[0] != window_size or window_org.shape[1] != window_size:
             continue
+        
+        # if image is a gray image - add empty 3rd dimension for the .shape[2] to exist
+        if org_img.ndim == 2:
+            org_img = np.expand_dims(org_img, axis=-1)
 
         for i in range(org_img.shape[2]):
             org_band = window_org[:, :, i]
@@ -257,7 +277,7 @@ def uiq(
 
             numerator = 4 * org_pred_band_variance * org_band_mean * pred_band_mean
             denominator = (org_band_variance + pred_band_variance) * (
-                org_band_mean**2 + pred_band_mean**2
+                org_band_mean ** 2 + pred_band_mean ** 2
             )
 
             if denominator != 0.0:
@@ -299,6 +319,10 @@ def sre(org_img: np.ndarray, pred_img: np.ndarray):
     _assert_image_shapes_equal(org_img, pred_img, "SRE")
 
     org_img = org_img.astype(np.float32)
+    
+    # if image is a gray image - add empty 3rd dimension for the .shape[2] to exist
+    if org_img.ndim == 2:
+        org_img = np.expand_dims(org_img, axis=-1)
 
     sre_final = []
     for i in range(org_img.shape[2]):
